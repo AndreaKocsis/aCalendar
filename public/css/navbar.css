@@ -1,0 +1,36 @@
+@font-face {
+  font-family: "Mistral";
+  src: url(/fonts/mistral.ttf?f43c61b480b234923426d3378be141a4) format("truetype");
+}
+
+.logo {
+  font-family: "Mistral";
+  font-size: 35px !important;
+}
+
+.navbar {
+  padding: 8px 3% !important;
+}
+
+.navbar-nav:first-child {
+  margin: auto;
+}
+
+.nav-link {
+  color: white !important;
+}
+
+.navlink-btn {
+  border: 1px solid white;
+  margin: 0 5px;
+  width: 120px;
+  /* border-radius: 50%; */
+  text-align: center;
+}
+
+.navlink-btn:hover,
+.nav-link:focus {
+  background-color: white;
+  color: #343a40 !important;
+}
+

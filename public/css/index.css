@@ -1,0 +1,34 @@
+@font-face {
+  font-family: "Mistral";
+  src: url(/fonts/mistral.ttf?f43c61b480b234923426d3378be141a4) format("truetype");
+}
+
+.bg-img {
+  background-image: url("/img/bg.png");
+  background-position: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.title {
+  font-family: "Mistral";
+  position: absolute;
+  top: 40%;
+  left: 2%;
+  /* transform: translate(-50%, -50%); */
+  color: white;
+  font-size: 80px;
+}
+
+.title-writer {
+  font-size: 40px;
+}
+
+#page-content {
+  margin: 20px 3%;
+}
+
+body {
+  color: red;
+}
+
