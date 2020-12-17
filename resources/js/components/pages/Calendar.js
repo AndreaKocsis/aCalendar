@@ -4,7 +4,6 @@ import Navigation from '../Navigation';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction";
-import { INITIAL_EVENTS, createEventId } from './event-utils';
 import { Row, Col } from 'react-bootstrap';
 
 class Calendar extends Component {

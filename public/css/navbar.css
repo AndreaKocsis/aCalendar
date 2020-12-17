@@ -9,7 +9,7 @@
 }
 
 .navbar {
-  padding: 8px 3% !important;
+  padding: 5px 3% !important;
 }
 
 .navbar-nav:first-child {
@@ -29,7 +29,7 @@
 }
 
 .navlink-btn:hover,
-.nav-link:focus {
+.navlink-btn:focus {
   background-color: white;
   color: #343a40 !important;
 }
