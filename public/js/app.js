@@ -82826,7 +82826,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.StrictMode, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Routes__WEBPACK_IMPORTED_MODULE_2__["default"], null)), document.getElementById('root'));
+react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(
+/*#__PURE__*/
+// <React.StrictMode>
+react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Routes__WEBPACK_IMPORTED_MODULE_2__["default"], null), // </React.StrictMode>,
+document.getElementById('root'));
 
 /***/ }),
 
@@ -82847,6 +82851,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _auth_Logout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./auth/Logout */ "./resources/js/components/auth/Logout.js");
 /* harmony import */ var react_bootstrap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-bootstrap */ "./node_modules/react-bootstrap/esm/index.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -82885,19 +82891,19 @@ var Navigation = /*#__PURE__*/function (_Component) {
     _classCallCheck(this, Navigation);
 
     _this = _super.call(this, props);
-    _this.state = {
+    _this.state = _defineProperty({
       email: '',
       password: '',
       msg: "",
       isLoading: false,
       redirect: false,
-      errMsgEmail: "",
-      errMsgPwd: "",
       errMsg: "",
       show: false,
       ifnotrender: false
-    };
+    }, "isLoading", true);
     _this.onChangehandler = _this.onChangehandler.bind(_assertThisInitialized(_this));
+    _this.loginHandler = _this.loginHandler.bind(_assertThisInitialized(_this));
+    _this.logoutHandler = _this.logoutHandler.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -82908,14 +82914,63 @@ var Navigation = /*#__PURE__*/function (_Component) {
       var value = e.target.value;
       var data = {};
       data[name] = value;
+      data['errMsg'] = false;
+      data['msg'] = false;
       this.setState(function (prevState) {
         return data;
       });
     }
   }, {
+    key: "loginHandler",
+    value: function loginHandler() {
+      var _this2 = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_1___default.a.post("".concat("http://www.api.acalendar", "/api/user-login"), {
+        email: this.state.email,
+        password: this.state.password
+      }).then(function (response) {
+        _this2.setState({
+          isLoading: false
+        });
+
+        if (response.data.status === 200) {
+          localStorage.setItem("isLoggedIn", true);
+          localStorage.setItem("userData", JSON.stringify(response.data.data));
+
+          _this2.setState({
+            msg: response.data.message
+          });
+
+          _this2.setState({
+            redirect: true
+          });
+        }
+
+        if (response.data.status === "failed" && response.data.success === undefined) {
+          _this2.setState({
+            errMsg: 'Nem megfelelő a felhasználónév vagy a jelszó!'
+          });
+        } else if (response.data.status === "failed" && response.data.success === false) {
+          _this2.setState({
+            errMsg: response.data.message
+          });
+        }
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    }
+  }, {
+    key: "logoutHandler",
+    value: function logoutHandler() {
+      localStorage.clear();
+      this.setState({
+        redirect: true
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
 
       var login = localStorage.getItem("isLoggedIn");
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Navbar"], {
@@ -82947,23 +83002,23 @@ var Navigation = /*#__PURE__*/function (_Component) {
         href: "#",
         variant: "primary",
         onClick: function onClick() {
-          return Object(_auth_Logout__WEBPACK_IMPORTED_MODULE_3__["Logout"])();
+          return _this3.logoutHandler();
         }
       }, "Kijelentkez\xE9s")) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Nav"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Nav"].Link, {
         href: "#",
         variant: "primary",
         onClick: function onClick() {
-          return _this2.setState(function (state) {
+          return _this3.setState(function (state) {
             return {
-              show: !_this2.state.show
+              show: !_this3.state.show
             };
           });
         }
       }, "Bejelentkez\xE9s"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Modal"], {
         show: this.state.show,
         onHide: function onHide() {
-          return _this2.setState({
-            show: !_this2.state.show
+          return _this3.setState({
+            show: !_this3.state.show
           });
         }
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Modal"].Header, {
@@ -82978,9 +83033,7 @@ var Navigation = /*#__PURE__*/function (_Component) {
         onChange: this.onChangehandler
       }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
         className: "text-danger"
-      }, this.state.msg), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
-        className: "text-danger"
-      }, this.state.errMsgEmail)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Form"].Group, {
+      }, this.state.msg)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Form"].Group, {
         as: react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Col"],
         controlId: "formGridPassword"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Form"].Label, null, "Jelsz\xF3:"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Form"].Control, {
@@ -82988,21 +83041,19 @@ var Navigation = /*#__PURE__*/function (_Component) {
         name: "password",
         value: this.state.password || '',
         onChange: this.onChangehandler
-      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
-        className: "text-danger"
-      }, this.state.errMsgPwd)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+      }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Form"].Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
         className: "text-danger"
       }, this.state.errMsg)))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Modal"].Footer, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Button"], {
         variant: "secondary",
         onClick: function onClick() {
-          return _this2.setState({
-            show: !_this2.state.cshow
+          return _this3.setState({
+            show: !_this3.state.cshow
           });
         }
       }, "M\xE9gse"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_4__["Button"], {
         variant: "primary",
         onClick: function onClick() {
-          return Object(_auth_Login__WEBPACK_IMPORTED_MODULE_2__["Login"])(_this2.state);
+          return _this3.loginHandler();
         }
       }, "Bejelentkez\xE9s"))))));
     }
