@@ -3,6 +3,14 @@
     src: url('./fonts/mistral.ttf') format('truetype');
 }
 
+body{color: red;}
+#page-content{
+    margin: 20px 3%;
+}
+#page-title{
+    margin-bottom: 30px;
+}
+
 .bg-img{
     background-image: url("/img/bg.png");
 
@@ -25,7 +33,14 @@
     font-size: 40px;
 }
 
-#page-content{
-    margin: 20px 3%;
+.table-content thead tr td, .table-content thead tr th {
+    background: #343a40;
+    color: white;
 }
-body{color: red;}
+.table-content .page-item.active .page-link{
+    background-color: #343a40 !important;
+    border-color: #343a40 !important;
+}
+
+
+

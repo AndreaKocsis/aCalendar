@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
+    protected $fillable = [ 'name', 'description'];
+
     public static function updateRow($id, $data)
     {
         $db = self::findOrFail($id);

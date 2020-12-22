@@ -13,13 +13,11 @@ class Navigation extends Component {
     this.state = {
       email : '',
       password : '',
-      msg: "",
       isLoading: false,
       redirect: false,
       errMsg: "",
       show : false,
-      ifnotrender : false,
-      isLoading: true 
+      ifnotrender : false
     }
 
     this.onChangehandler = this.onChangehandler.bind(this);
@@ -33,7 +31,6 @@ class Navigation extends Component {
     let data = {};
     data[name] = value;
     data['errMsg'] = false;
-    data['msg'] = false;
     this.setState(prevState => data);
   };
 
@@ -65,6 +62,7 @@ class Navigation extends Component {
   logoutHandler(){
     localStorage.clear();
     this.setState({redirect : true})
+    window.location.reload();
   }
 
 
@@ -110,7 +108,6 @@ class Navigation extends Component {
                     <Form.Group as={Col} controlId="formGridEmail">
                       <Form.Label>Email cím:</Form.Label>
                       <Form.Control type="email" name="email" value={this.state.email || ''} onChange={this.onChangehandler}/>
-                      <span className="text-danger">{this.state.msg}</span>
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridPassword">

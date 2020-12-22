@@ -90,15 +90,9 @@ class UserController extends Controller
 
                 return response()->json(["status" => $this->status_code, "success" => true, "message" => "You have logged in successfully", "data" => $user]);
             }
-
-            else {
-                return response()->json(["status" => "failed", "success" => false, "message" => "Unable to login. Incorrect password"]);
-            }
         }
 
-        else {
-            return response()->json(["status" => "failed", "success" => false, "message" => "Unable to login. Email doesn't exist."]);
-        }
+        return response()->json(["status" => "failed", "success" => false, "message" => "Nem megfelelő a felhasználónév vagy a jelszó!"]);
     }
 
     // ------------------ [ User Detail ] ---------------------

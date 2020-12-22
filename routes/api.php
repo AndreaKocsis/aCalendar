@@ -22,3 +22,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/events', 'EventController@getEvents');
+Route::get('/get-categories', 'CategoryController@getCategories');
+Route::post('/create-category', 'CategoryController@createCategory');
+
+Route::get('/get-tags', 'TagController@getTags');
+Route::post('/create-tag', 'TagController@createTag');
