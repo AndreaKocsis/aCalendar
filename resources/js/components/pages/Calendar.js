@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import Select from 'react-select';
 import FullCalendar, { formatDate } from '@fullcalendar/react';
 import Navigation from '../Navigation';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction";
-import { Row, Col } from 'react-bootstrap';
+import SweetAlert from 'react-bootstrap-sweetalert';
+import { Row, Col, Form } from 'react-bootstrap';
 
 class Calendar extends Component {
     render(){ return (
@@ -27,6 +29,12 @@ class PageContent extends Component {
         this.state = {
             currentEvents: [],
             all_events: [],
+            show: false,
+            modalTitle: 'Új esemény létrehozása',
+            eventTitle: '',
+            eventDescription: '',
+            eventCategories: [],
+            eventSelectedCategory: 0
         }
     }
 
@@ -40,8 +48,16 @@ class PageContent extends Component {
             this.setState({
                 all_events: data
             });
-            console.log(this.state.all_events)
         })
+
+
+        fetch(`${process.env.MIX_DOMAIN}/api/get-categories-to-calendar`)
+        .then((res) => res.json())
+        .then((eventCategories) => {
+            this.setState({eventCategories: eventCategories})
+        } )
+
+            
     }
 
         
@@ -55,6 +71,32 @@ class PageContent extends Component {
         this.setState({
             currentEvents: events
         })
+    }
+
+    saveEvent(){
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: this.state.eventTitle, 
+                description: this.state.eventDescription, 
+                category_id: this.state.eventSelectedCategory
+            } )
+        };
+        fetch(`${process.env.MIX_DOMAIN}/api/save-event`, requestOptions)
+        .then((res) => res.json())
+        .then((data) => {
+            //ha minden oké, akkor ez, különben ..még fejlesztés alatt
+            if($data['status'] == 200){
+                this.setState({
+                    show: false,
+                    eventSelectedCategory: 0,
+                    eventTitle: '',
+                    eventDescription: '',
+                })
+            }
+            alert($data['msg'])
+        } )
     }
 
 
@@ -84,7 +126,7 @@ class PageContent extends Component {
                     selectMirror={true}
                     dayMaxEvents={true}
                     events={this.state.all_events} // alternatively, use the `events` setting to fetch from a feed
-                    select={this.handleDateSelect}
+                    select={() => this.setState({ show: true })}
                     eventContent={renderEventContent} // custom render function
                     eventClick={this.handleEventClick}
                     eventsSet={this.handleEvents.bind(this)} // called after events are initialized/added/changed/removed
@@ -94,26 +136,49 @@ class PageContent extends Component {
                     eventRemove={function(){}}
                     */
                 />
+
+
+                <SweetAlert
+                    show={this.state.show}
+                    title={this.state.modalTitle}
+                    onConfirm={() => this.saveEvent()}
+                    onCancel={() => this.setState({ show: false })}
+                    confirmBtnText = "Mentés"
+                    cancelBtnText = "Mégse"
+                    >
+                    <hr/>
+                    <Form>
+                        <Form.Group as={Row} >
+                            <Form.Label column sm="3" style={{textAlign :'left'}}>Cím:</Form.Label>
+                            <Col sm="9"><Form.Control type="text" name="title" placeholder={'Esemény megnevezése'} value={this.state.eventTitle} onChange={(e) => this.setState({ eventTitle: e.target.value })}/></Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} >
+                            <Form.Label column sm="3" style={{textAlign :'left'}}>Kategória:</Form.Label>
+                            <Col sm="9">
+                                <Form.Control as="select" value={this.state.eventSelectedCategory} onChange={(e) => this.setState({eventSelectedCategory: e.target.value})}>
+                                    <option key={0} value={0}>Kérem válasszon!</option>
+                                    {Object.keys(this.state.eventCategories).map((row) =>
+                                    <option key={row} value={row}>
+                                        {this.state.eventCategories[row]['name']}
+                                    </option>
+                                    )}
+                                </Form.Control>
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row} >
+                            <Form.Label column sm="3" style={{textAlign :'left'}}>Leírás:</Form.Label>
+                            <Col sm="9"><Form.Control as="textarea" rows={3} name="description" placeholder={'Leírás..'} value={this.state.eventDescription} onChange={(e) => this.setState({ eventDescription: e.target.value })}/></Col>
+                        </Form.Group>
+                    </Form>
+                    <hr/>
+                    
+                </SweetAlert>
             </div>
         </div>
+        
     )}
-
-    handleDateSelect(selectInfo){
-        let title = prompt('Please enter a new title for your event')
-        let calendarApi = selectInfo.view.calendar
-
-        calendarApi.unselect() // clear date selection
-
-        if (title) {
-            calendarApi.addEvent({
-                id: createEventId(),
-                title,
-                start: selectInfo.startStr,
-                end: selectInfo.endStr,
-                allDay: selectInfo.allDay
-            })
-        }
-    }
 
 }
 

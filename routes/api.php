@@ -22,6 +22,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/events', 'EventController@getEvents');
+Route::post('/save-event', 'EventController@saveEvent');
+Route::get('/get-categories-to-calendar', 'CalendarController@getCategories');
+
 Route::get('/get-categories', 'CategoryController@getCategories');
 Route::post('/create-category', 'CategoryController@createCategory');
 
