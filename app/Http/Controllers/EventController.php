@@ -17,6 +17,9 @@ class EventController extends Controller
         $events = Event::where('title',$data['title'])->first();
         $ret = [];
         
+        $data['start'] = date('y-m-d h:i:s', strtotime( $data['start'].' +1 Hour'));
+        $data['end'] = date('y-m-d h:i:s', strtotime( $data['end'].'+1 Hour'));
+
         if($events){
             $ret['msg'] = 'Ilyen nevű esemény már létezik!';
             $ret['status'] = 404;
