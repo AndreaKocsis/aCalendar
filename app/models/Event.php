@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
-    protected $fillable = [ 'user_id','title', 'description','start','end','category_id'];
+    protected $fillable = [ 'id','user_id','title', 'description','start','end','category_id'];
 
     public static function updateRow($id, $data)
     {

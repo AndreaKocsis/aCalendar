@@ -14,21 +14,39 @@ class EventController extends Controller
 
     public function saveEvent(Request $request){
         $data = $request->all();
-        $events = Event::where('title',$data['title'])->first();
+        $event = Event::find($data['id']);
         $ret = [];
-        
-        $data['start'] = date('y-m-d h:i:s', strtotime( $data['start'].' +1 Hour'));
-        $data['end'] = date('y-m-d h:i:s', strtotime( $data['end'].'+1 Hour'));
+        $ret['status'] = 200;
+        $ret['msg'] = 'Sikeres mentés!';
+        $ret = $this->eventValidation($ret, $data);
 
-        if($events){
-            $ret['msg'] = 'Ilyen nevű esemény már létezik!';
-            $ret['status'] = 404;
-        }else{
-            Event::createRow($data);
-            $ret['msg'] = 'Sikeres mentés!';
-            $ret['status'] = 200;
+        if($ret['status'] == 200){
+            $data['start'] = date('y-m-d h:i:s', strtotime( $data['start'].' +1 Hour')); //valami időzóna zavar van itt, vagy nem tom..db-be egy órával kevesebbel menti
+            $data['end'] = date('y-m-d h:i:s', strtotime( $data['end'].'+1 Hour'));
+    
+            //update
+            if($event){
+                Event::updateRow($data['id'],$data);
+    
+            //create
+            }else{
+                Event::createRow($data);
+            }
         }
-        
+          
+        return $ret;
+    }
+
+    public function eventValidation($ret, $data){
+        if(!isset($data['title']) || empty($data['title']) ||  !isset($data['start']) || empty($data['start'])  || !isset($data['end']) || empty($data['end'])){
+            $ret['status'] = 'failed';
+            $ret['msg'] = 'Kötelezően kitöltendő a Cím, Start és a Vége mezők!';
+        }
+
+        if(isset($data['start']) && !empty($data['start'])  && isset($data['end']) && !empty($data['end']) && $data['end'] < $data['start']){
+            $ret['status'] = 'failed';
+            $ret['msg'] = 'A Start mezőben nem lehet későbbi dátum, mint a Vége mezőben!';
+        }
         return $ret;
     }
 }

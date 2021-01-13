@@ -7,7 +7,10 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction";
 import SweetAlert from 'react-bootstrap-sweetalert';
-import { Row, Col, Form } from 'react-bootstrap';
+import { Row, Col, Form, ButtonGroup, Button } from 'react-bootstrap';
+import Moment from 'react-moment';
+import 'moment-timezone';
+// import Tooltip from "https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js";
 
 
 class Calendar extends Component {
@@ -24,6 +27,7 @@ class Calendar extends Component {
             eventSelectedCategory: 0,
             eventStart : '',
             eventEnd : '',
+            eventId: 0,
         }
 
         this.getEvents = this.getEvents.bind(this);
@@ -53,10 +57,35 @@ class Calendar extends Component {
         })
     }
 
+    eventDateSelect(time){
+        this.eventModalBlur()
+        this.setState({ 
+            modalTitle: 'Új esemény létrehozása',
+            show: true, 
+            eventStart: time.start,
+            eventEnd: time.end,
+        })
+    }
+
         
-    handleEventClick (clickInfo) {
-        if (window.confirm(`Biztosan törlöd ezt az eseményt: '${clickInfo.event.title}'?`)) {
-            clickInfo.event.remove()
+    handleEventClick (e) {
+       
+        this.eventModalBlur();
+        this.setState({
+            modalTitle: e.event.title+' esemény módosítása',
+            show: true,
+            eventId: e.event.id,
+            eventTitle: e.event.title,
+            eventDescription: e.event.extendedProps.description,
+            eventSelectedCategory: e.event.extendedProps.category_id,
+            eventStart: e.event.start,
+            eventEnd: e.event.end,
+        })
+    }
+
+    deleteEvent(){
+        if (window.confirm(`Biztosan törlöd ezt az eseményt: '${this.state.eventTitle}'?`)) {
+            alert('hehe, ez még not ready')
         }
     }
 
@@ -65,6 +94,37 @@ class Calendar extends Component {
             currentEvents: events
         })
     }
+
+    eventContent (e) {
+        return (
+            <>
+              <b>{e.timeText}</b>
+              <p><i>{e.event.title}</i></p>
+            </>
+        )
+    };
+
+    eventRender(info) {
+        // var tooltip = new Tooltip(info.el, {
+        //   title: info.event.extendedProps.title,
+        //   placement: "top",
+        //   trigger: "click",
+        //   container: "body"
+        // });
+    }
+
+    eventModalBlur(){
+        this.setState({
+            show: false,
+            eventId: 0,
+            eventTitle: '',
+            eventDescription: '',
+            eventSelectedCategory: 0,
+            eventStart: '',
+            eventEnd: '',
+        })
+    }
+
 
     saveEvent(){
         const requestOptions = {
@@ -76,12 +136,12 @@ class Calendar extends Component {
                 category_id: this.state.eventSelectedCategory,
                 start: this.state.eventStart,
                 end: this.state.eventEnd,
+                id: this.state.eventId,
             } )
         };
         fetch(`${process.env.MIX_DOMAIN}/api/save-event`, requestOptions)
         .then((res) => res.json())
         .then((data) => {
-            //ha minden oké, akkor ez, különben ..még fejlesztés alatt
             if(data['status'] == 200){
                 this.setState({
                     show: false,
@@ -127,31 +187,21 @@ class Calendar extends Component {
                                         selectable={true}
                                         selectMirror={true}
                                         dayMaxEvents={true}
-                                        events={this.state.all_events} // alternatively, use the `events` setting to fetch from a feed
-                                        select={(time) => this.setState({ 
-                                                show: true, 
-                                                eventStart: time.start,
-                                                eventEnd: time.end,
-                                            })
-                                        }
-                                        eventContent={renderEventContent} // custom render function
-                                        eventClick={this.handleEventClick}
-                                        eventsSet={this.handleEvents.bind(this)} // called after events are initialized/added/changed/removed
-                                        /* you can update a remote database when these fire:
-                                        eventAdd={function(){}}
-                                        eventChange={function(){}}
-                                        eventRemove={function(){}}
-                                        */
+                                        events={this.state.all_events}
+                                        select={this.eventDateSelect.bind(this)}
+                                        eventClick={this.handleEventClick.bind(this)}
+                                        eventsSet={this.handleEvents.bind(this)} 
+                                        eventContent={this.eventContent}
+                                        eventRender={this.eventRender}
                                     />
 
 
                                     <SweetAlert
                                         show={this.state.show}
                                         title={this.state.modalTitle}
-                                        onConfirm={() => this.saveEvent()}
-                                        onCancel={() => this.setState({ show: false })}
-                                        confirmBtnText = "Mentés"
-                                        cancelBtnText = "Mégse"
+                                        closeOnConfirm= {false}
+                                        showConfirmButton= {false} 
+                                        showCancelButton= {false} 
                                         >
                                         <hr/>
                                         <Form>
@@ -219,6 +269,15 @@ class Calendar extends Component {
                                                 <Form.Label column sm="3" style={{textAlign :'left'}}>Leírás:</Form.Label>
                                                 <Col sm="9"><Form.Control as="textarea" rows={3} name="description" placeholder={'Leírás..'} value={this.state.eventDescription} onChange={(e) => this.setState({ eventDescription: e.target.value })}/></Col>
                                             </Form.Group>
+
+                                            <ButtonGroup className="mb-2 btn-block">
+                                                <Button variant="success" onClick={() => this.saveEvent()}>Mentés</Button>
+                                                <Button variant="primary" onClick={(e) => this.setState({ show: false })}>Mégse</Button>
+
+                                                {this.state.eventId != 0 &&
+                                                    <Button variant="danger"  onClick={(e) => this.deleteEvent().bind(this)}>Törlés</Button>
+                                                }
+                                            </ButtonGroup>
                                         </Form>
                                         <hr/>
                                         
@@ -233,15 +292,6 @@ class Calendar extends Component {
         
     )}
 
-}
-
-function renderEventContent(eventInfo) {
-  return (
-    <>
-        <b>{eventInfo.timeText}</b>
-        <i>{eventInfo.event.title}</i>
-    </>
-  )
 }
 
   
