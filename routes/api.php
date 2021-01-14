@@ -22,8 +22,9 @@ Route::get("user/{email}", "UserController@userDetail");
 // });
 
 //calendar events
-Route::get('/events', 'EventController@getEvents');
+Route::post('/events', 'EventController@getEvents');
 Route::post('/save-event', 'EventController@saveEvent');
+Route::post('/delete-event', 'EventController@deleteEvent');
 
 //categories
 Route::get('/get-categories-to-calendar', 'CalendarController@getCategories');

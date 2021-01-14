@@ -47,3 +47,7 @@ body {
   border-color: #343a40 !important;
 }
 
+.sweet-alert p {
+  display: none !important;
+}
+

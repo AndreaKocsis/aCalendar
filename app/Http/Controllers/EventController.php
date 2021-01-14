@@ -7,8 +7,9 @@ use App\Models\Event;
 
 class EventController extends Controller
 {
-    public function getEvents(){
-        $events = Event::get();
+    public function getEvents(Request $request){
+        $data = $request->all();
+        $events = Event::where('user_id',$data['user_id'])->get();
         return $events;
     }
 
@@ -34,6 +35,19 @@ class EventController extends Controller
             }
         }
           
+        return $ret;
+    }
+
+    public function deleteEvent(Request $request){
+        $data = $request->all();
+        $event = Event::find($data['id']);
+        $ret = [];
+        $ret['status'] = 200;
+        $ret['msg'] = 'Sikeres törlés!';
+
+        if($event){
+            Event::deleteRow($data['id']);
+        } 
         return $ret;
     }
 

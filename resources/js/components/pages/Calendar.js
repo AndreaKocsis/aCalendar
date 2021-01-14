@@ -28,6 +28,7 @@ class Calendar extends Component {
             eventStart : '',
             eventEnd : '',
             eventId: 0,
+            userData: JSON.parse(localStorage.getItem("userData"))
         }
 
         this.getEvents = this.getEvents.bind(this);
@@ -35,9 +36,7 @@ class Calendar extends Component {
 
 
     componentWillMount(){
-        this._isMounted = true;
         this.getEvents();
-
 
         fetch(`${process.env.MIX_DOMAIN}/api/get-categories-to-calendar`)
         .then((res) => res.json())
@@ -47,7 +46,16 @@ class Calendar extends Component {
     }
 
     getEvents(){
-        fetch(`${process.env.MIX_DOMAIN}/api/events`)
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: this.state.userData.id,
+            } )
+        };
+
+        fetch(`${process.env.MIX_DOMAIN}/api/events`, requestOptions)
         .then((res) => res.json())
         .then((data) => {
             
@@ -85,7 +93,25 @@ class Calendar extends Component {
 
     deleteEvent(){
         if (window.confirm(`Biztosan törlöd ezt az eseményt: '${this.state.eventTitle}'?`)) {
-            alert('hehe, ez még not ready')
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: this.state.eventId,
+                } )
+            };
+            fetch(`${process.env.MIX_DOMAIN}/api/delete-event`, requestOptions)
+            .then((res) => res.json())
+            .then((data) => {
+                if(data['status'] == 200){
+                    this.setState({
+                        show: false,
+                    })
+    
+                    this.getEvents();
+                }
+                alert(data['msg'])
+            } )
         }
     }
 
@@ -137,6 +163,7 @@ class Calendar extends Component {
                 start: this.state.eventStart,
                 end: this.state.eventEnd,
                 id: this.state.eventId,
+                user_id: this.state.userData.id,
             } )
         };
         fetch(`${process.env.MIX_DOMAIN}/api/save-event`, requestOptions)
@@ -145,9 +172,6 @@ class Calendar extends Component {
             if(data['status'] == 200){
                 this.setState({
                     show: false,
-                    eventSelectedCategory: 0,
-                    eventTitle: '',
-                    eventDescription: '',
                 })
 
                 this.getEvents();
@@ -270,6 +294,8 @@ class Calendar extends Component {
                                                 <Col sm="9"><Form.Control as="textarea" rows={3} name="description" placeholder={'Leírás..'} value={this.state.eventDescription} onChange={(e) => this.setState({ eventDescription: e.target.value })}/></Col>
                                             </Form.Group>
 
+                                            <hr/>
+
                                             <ButtonGroup className="mb-2 btn-block">
                                                 <Button variant="success" onClick={() => this.saveEvent()}>Mentés</Button>
                                                 <Button variant="primary" onClick={(e) => this.setState({ show: false })}>Mégse</Button>
@@ -279,7 +305,6 @@ class Calendar extends Component {
                                                 }
                                             </ButtonGroup>
                                         </Form>
-                                        <hr/>
                                         
                                     </SweetAlert>
                                 </div>
