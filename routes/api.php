@@ -27,10 +27,10 @@ Route::post('/save-event', 'EventController@saveEvent');
 Route::post('/delete-event', 'EventController@deleteEvent');
 
 //categories
-Route::get('/get-categories-to-calendar', 'CalendarController@getCategories');
-Route::get('/get-categories', 'CategoryController@getCategories');
+Route::post('/get-categories-to-calendar', 'CalendarController@getCategories');
+Route::post('/get-categories', 'CategoryController@getCategories');
 Route::post('/create-category', 'CategoryController@createCategory');
 
 //tags
-Route::get('/get-tags', 'TagController@getTags');
+Route::post('/get-tags', 'TagController@getTags');
 Route::post('/create-tag', 'TagController@createTag');

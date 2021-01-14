@@ -9,13 +9,14 @@ class Tags extends Component {
         super(props);
         this.state = {
             tagsData : [],
-            isLoading: true
+            isLoading: true,
+            userData: JSON.parse(localStorage.getItem("userData"))
         }
         this.getTagsHandler = this.getTagsHandler.bind(this);
     }
 
     async getTagsHandler(){
-        const res = await axios.get(`${process.env.MIX_DOMAIN}/api/get-tags`)
+        const res = await axios.post(`${process.env.MIX_DOMAIN}/api/get-tags`,{user_id: this.state.userData.id})
         this.setState({loading:false, tagsData: res.data})
     }
 
@@ -46,7 +47,8 @@ class NewTagForm extends Component{
             msg: "",
             errMsg:"",
             redirect: false,
-            rerenderDatatable: props.callBack
+            rerenderDatatable: props.callBack,
+            userData: JSON.parse(localStorage.getItem("userData"))
         }
     
         this.onSubmitHandler = this.onSubmitHandler.bind(this);
@@ -57,6 +59,7 @@ class NewTagForm extends Component{
         axios.post(`${process.env.MIX_DOMAIN}/api/create-tag`, {
             name: this.state.name,
             description: this.state.description,
+            user_id: this.state.userData.id,
         })
         .then((response) => {
             if (response.data.status === 200) {

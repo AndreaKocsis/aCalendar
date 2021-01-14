@@ -7,8 +7,8 @@ use App\Models\Category;
 
 class CalendarController extends Controller
 {
-    public function getCategories(){
-        $categories = Category::get()->toArray();
+    public function getCategories(Request $request){
+        $categories = Category::where('user_id',$request->user_id)->get()->toArray();
         $data = [];
         foreach($categories as $row){
             $data[$row['id']]['id']   = $row['id'];

@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Validator;
 
 class TagController extends Controller
 {
-    public function getTags(){
+    public function getTags(Request $request){
         $data = [];
-        $data["rows"] = Tag::get()->toArray();
+        $data["rows"] = Tag::where('user_id',$request->user_id)->get()->toArray();
         $data["columns"] = [
             ["label" => "Megnevezés", "field" => "name"],
             ["label" => "Leírás", "field" => "description"],

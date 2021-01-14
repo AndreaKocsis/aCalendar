@@ -37,12 +37,20 @@ class Calendar extends Component {
 
     componentWillMount(){
         this.getEvents();
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: this.state.userData.id,
+            } )
+        };
 
-        fetch(`${process.env.MIX_DOMAIN}/api/get-categories-to-calendar`)
+        fetch(`${process.env.MIX_DOMAIN}/api/get-categories-to-calendar`, requestOptions)
         .then((res) => res.json())
         .then((eventCategories) => {
             this.setState({eventCategories: eventCategories})
-        } )     
+        } )    
+         
     }
 
     getEvents(){

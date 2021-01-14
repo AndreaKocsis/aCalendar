@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
-    public function getCategories(){
+    public function getCategories(Request $request){
         $data = [];
-        $data["rows"] = Category::get()->toArray();
+        $data["rows"] = Category::where('user_id',$request->user_id)->get()->toArray();
         $data["columns"] = [
             ["label" => "Megnevezés", "field" => "name"],
             ["label" => "Leírás", "field" => "description"],

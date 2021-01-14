@@ -9,13 +9,14 @@ class Categories extends Component {
         super(props);
         this.state = {
             categoriesData : [],
-            isLoading: true
+            isLoading: true,
+            userData: JSON.parse(localStorage.getItem("userData"))
         }
         this.getCategoriesHandler = this.getCategoriesHandler.bind(this);
     }
 
     async getCategoriesHandler(){
-        const res = await axios.get(`${process.env.MIX_DOMAIN}/api/get-categories`)
+        const res = await axios.post(`${process.env.MIX_DOMAIN}/api/get-categories`,{user_id: this.state.userData.id})
         this.setState({loading:false, categoriesData: res.data})
     }
 
@@ -46,7 +47,8 @@ class NewCategoryForm extends Component{
             msg: "",
             errMsg:"",
             redirect: false,
-            rerenderDatatable: props.callBack
+            rerenderDatatable: props.callBack,
+            userData: JSON.parse(localStorage.getItem("userData"))
         }
     
         this.onSubmitHandler = this.onSubmitHandler.bind(this);
@@ -57,6 +59,7 @@ class NewCategoryForm extends Component{
         axios.post(`${process.env.MIX_DOMAIN}/api/create-category`, {
             name: this.state.name,
             description: this.state.description,
+            user_id: this.state.userData.id,
         })
         .then((response) => {
             if (response.data.status === 200) {
